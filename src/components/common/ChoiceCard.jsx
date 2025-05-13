@@ -14,19 +14,6 @@ const ChoiceCard = ({ choice, onClick, disabled, isWinner = false, isActive = fa
     }
   }
 
-  // const getChoiceBg = () => {
-  //   switch (choice) {
-  //     case 'ROCK':
-  //       return '/assets/images/choices/rock-bg.jpg'
-  //     case 'PAPER':
-  //       return '/assets/images/choices/paper-bg.jpg'
-  //     case 'SCISSORS':
-  //       return '/assets/images/choices/scissors-bg.jpg'
-  //     default:
-  //       return ''
-  //   }
-  // }
-
   return (
     <motion.div
       whileHover={disabled ? {} : { scale: 1.05 }}
@@ -38,13 +25,6 @@ const ChoiceCard = ({ choice, onClick, disabled, isWinner = false, isActive = fa
         ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
       `}
     >
-      {/* <div className="absolute inset-0 z-0">
-        <img
-          src={getChoiceBg()}
-          alt={`${choice} background`}
-          className="h-full w-full object-contain"
-        />
-      </div> */}
       <motion.div
         animate={{
           scale: isActive ? [1, 1.1, 1] : 1,

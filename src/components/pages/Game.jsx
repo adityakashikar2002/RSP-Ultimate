@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useGame } from '../../context/GameContext'
 import GameHeader from '../game/GameHeader'
 import GameBoard from '../game/GameBoard'
@@ -16,8 +16,12 @@ const Game = () => {
     newGame,
     setShowRules,
     playerScore,
-    computerScore
+    computerScore,
+    timeLeft, // We need to access timeLeft to pass initialTime
+    setTimeLeft, // We might need to reset timeLeft here as well
   } = useGame()
+
+  const [timerResetKey, setTimerResetKey] = useState(0);
 
   useEffect(() => {
     document.title = 'Play Game | Rock Paper Scissors Ultimate'
@@ -29,28 +33,43 @@ const Game = () => {
     return 'draw';
   }
 
+  const handleStartGame = () => {
+    startGame();
+    setTimerResetKey(prev => prev + 1); // Trigger timer reset
+    setTimeLeft(60); // Or your default time in GameContext
+  };
+
+  const handleNewGame = () => {
+    newGame();
+    setTimerResetKey(prev => prev + 1); // Trigger timer reset
+    setTimeLeft(60); // Or your default time in GameContext
+  };
+
   return (
     <section className="min-h-screen bg-game-pattern bg-cover bg-center py-12 px-4">
       <Confetti active={getResult() === 'player' && gameEnded} />
       <div className="max-w-4xl mx-auto">
         <div className="bg-dark/80 backdrop-blur-md rounded-3xl shadow-2xl p-6 md:p-8">
-          <Timer 
-            onTimeUp={() => handleGameEnd(false)} 
+          <Timer
+            initialTime={60} // Or use a constant from GameContext if needed
+            onTimeUp={() => handleGameEnd(false)}
+            isRunning={gameStarted && !gameEnded}
             onEndGame={() => handleGameEnd(true)}
+            resetTrigger={timerResetKey}
           />
-          
+
           <GameHeader />
-          
+
           <GameBoard />
-          
+
           {gameEnded ? (
-            <GameResult onNewGame={newGame} />
+            <GameResult onNewGame={handleNewGame} />
           ) : (
             <div className="flex justify-center gap-4 mt-8">
               {!gameStarted && (
                 <Button
                   size="lg"
-                  onClick={startGame}
+                  onClick={handleStartGame}
                   className="shadow-lg"
                 >
                   Start Game
@@ -73,69 +92,3 @@ const Game = () => {
 }
 
 export default Game
-
-// import { useEffect } from 'react'
-// import { useGame } from '../../context/GameContext'
-// import GameHeader from '../game/GameHeader'
-// import GameBoard from '../game/GameBoard'
-// import Timer from '../game/Timer'
-// import GameResult from '../game/GameResult'
-// import Button from '../common/Button'
-
-// const Game = () => {
-//   const {
-//     gameStarted,
-//     gameEnded,
-//     startGame,
-//     handleGameEnd,
-//     newGame,
-//     setShowRules,
-//   } = useGame()
-
-//   useEffect(() => {
-//     document.title = 'Play Game | Rock Paper Scissors Ultimate'
-//   }, [])
-
-//   return (
-//     <section className="min-h-screen bg-game py-12 px-4">
-//       <div className="max-w-4xl mx-auto">
-//         <div className="bg-dark/80 backdrop-blur-md rounded-3xl shadow-2xl p-6 md:p-8">
-//           <Timer
-//             onTimeUp={() => handleGameEnd(false)}
-//             onEndGame={() => handleGameEnd(true)}
-//           />
-
-//           <GameHeader />
-
-//           <GameBoard />
-
-//           {gameEnded ? (
-//             <GameResult onNewGame={newGame} />
-//           ) : (
-//             <div className="flex justify-center gap-4 mt-8">
-//               {!gameStarted && (
-//                 <Button
-//                   size="lg"
-//                   onClick={startGame}
-//                   className="shadow-lg"
-//                 >
-//                   Start Game
-//                 </Button>
-//               )}
-//               <Button
-//                 variant="outline"
-//                 size="lg"
-//                 onClick={() => setShowRules(true)}
-//                 className="shadow-lg"
-//               >
-//                 Show Rules
-//               </Button>
-//             </div>
-//           )}
-//         </div>
-//       </div>
-//     </section>
-//   )
-// }
-
-// export default Game
