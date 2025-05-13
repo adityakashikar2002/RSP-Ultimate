@@ -18,7 +18,7 @@
 //   const [gameEnded, setGameEnded] = useState(false)
 //   const [round, setRound] = useState(0)
 //   const [timeLeft, setTimeLeft] = useState(DEFAULT_GAME_TIME)
-//   const [gameEndTriggered, setGameEndTriggered] = useState(false)
+//   const [startTime, setStartTime] = useState(null)
 //   const [showRules, setShowRules] = useState(false)
 
 //   useEffect(() => {
@@ -36,7 +36,7 @@
 //     setGameEnded(false)
 //     setRound(0)
 //     setTimeLeft(DEFAULT_GAME_TIME)
-//     setGameEndTriggered(false)
+//     setStartTime(Date.now())
 //   }
 
 //   const handleChoice = (choice) => {
@@ -58,25 +58,30 @@
 //   }
 
 //   const handleGameEnd = (endedEarly = false) => {
-//     if (gameEndTriggered || !gameStarted) return
+//     if (!gameStarted) return
     
-//     setGameEndTriggered(true)
+//     const endTime = Date.now()
+//     const duration = Math.floor((endTime - startTime) / 1000) // in seconds
     
 //     const gameResult = playerScore > computerScore ? 'Win' : 
 //                       computerScore > playerScore ? 'Lose' : 'Draw'
     
-//     const gameData = {
-//       result: gameResult,
-//       playerScore,
-//       computerScore,
-//       rounds: round,
-//       timestamp: new Date().toISOString(),
-//       duration: DEFAULT_GAME_TIME - timeLeft,
-//       endedEarly
+//     // Don't save empty games (where no rounds were played)
+//     if (round > 0 || gameResult !== 'Draw') {
+//       const gameData = {
+//         result: gameResult,
+//         playerScore,
+//         computerScore,
+//         rounds: round,
+//         timestamp: new Date().toISOString(),
+//         duration,
+//         endedEarly
+//       }
+
+//       saveGameToLocalStorage(gameData)
+//       setGameHistory(prev => [gameData, ...prev])
 //     }
 
-//     saveGameToLocalStorage(gameData)
-//     setGameHistory(prev => [gameData, ...prev])
 //     setGameEnded(true)
 //     setGameStarted(false)
 //   }
@@ -90,7 +95,7 @@
 //     setGameStarted(false)
 //     setGameEnded(false)
 //     setRound(0)
-//     setGameEndTriggered(false)
+//     setTimeLeft(DEFAULT_GAME_TIME)
 //   }
 
 //   const clearHistory = () => {
@@ -128,6 +133,7 @@
 
 // export const useGame = () => useContext(GameContext)
 
+
 // GameContext.jsx
 import { createContext, useContext, useState, useEffect } from 'react'
 import { saveGameToLocalStorage, getGamesFromLocalStorage, clearGameHistory } from '../utils/storage'
@@ -150,6 +156,7 @@ export const GameProvider = ({ children }) => {
   const [timeLeft, setTimeLeft] = useState(DEFAULT_GAME_TIME)
   const [startTime, setStartTime] = useState(null)
   const [showRules, setShowRules] = useState(false)
+  const [gameSaved, setGameSaved] = useState(false) // Track if game has been saved
 
   useEffect(() => {
     const savedHistory = getGamesFromLocalStorage()
@@ -167,6 +174,7 @@ export const GameProvider = ({ children }) => {
     setRound(0)
     setTimeLeft(DEFAULT_GAME_TIME)
     setStartTime(Date.now())
+    setGameSaved(false) // Reset saved state when new game starts
   }
 
   const handleChoice = (choice) => {
@@ -188,28 +196,32 @@ export const GameProvider = ({ children }) => {
   }
 
   const handleGameEnd = (endedEarly = false) => {
-    if (!gameStarted) return
+    if (!gameStarted || gameSaved) return // Prevent duplicate saves
     
     const endTime = Date.now()
     const duration = Math.floor((endTime - startTime) / 1000) // in seconds
     
+    // Calculate actual time played (can't exceed game time)
+    const actualDuration = Math.min(duration, DEFAULT_GAME_TIME)
+    
     const gameResult = playerScore > computerScore ? 'Win' : 
                       computerScore > playerScore ? 'Lose' : 'Draw'
     
-    // Don't save empty games (where no rounds were played)
-    if (round > 0 || gameResult !== 'Draw') {
+    // Only save if at least one round was played
+    if (round > 0) {
       const gameData = {
         result: gameResult,
         playerScore,
         computerScore,
         rounds: round,
         timestamp: new Date().toISOString(),
-        duration,
+        duration: actualDuration,
         endedEarly
       }
 
       saveGameToLocalStorage(gameData)
       setGameHistory(prev => [gameData, ...prev])
+      setGameSaved(true) // Mark game as saved
     }
 
     setGameEnded(true)
@@ -226,6 +238,7 @@ export const GameProvider = ({ children }) => {
     setGameEnded(false)
     setRound(0)
     setTimeLeft(DEFAULT_GAME_TIME)
+    setGameSaved(false)
   }
 
   const clearHistory = () => {

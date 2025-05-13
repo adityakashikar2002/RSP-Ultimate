@@ -4,7 +4,6 @@
 // const Timer = ({ initialTime, onTimeUp, isRunning, onEndGame, resetTrigger }) => {
 //   const [timeLeft, setTimeLeft] = useState(initialTime);
 //   const timerRef = useRef(null);
-//   const prevIsRunningRef = useRef(isRunning);
 
 //   useEffect(() => {
 //     setTimeLeft(initialTime);
@@ -21,9 +20,6 @@
 //   };
 
 //   useEffect(() => {
-//     if (prevIsRunningRef.current === isRunning) return;
-//     prevIsRunningRef.current = isRunning;
-
 //     if (timerRef.current) {
 //       clearInterval(timerRef.current);
 //       timerRef.current = null;
@@ -34,24 +30,20 @@
 //         setTimeLeft((prev) => {
 //           if (prev <= 1) {
 //             clearInterval(timerRef.current);
-//             setTimeout(() => {
-//               onTimeUp();
-//             }, 0);
+//             onTimeUp();
 //             return 0;
 //           }
 //           return prev - 1;
 //         });
 //       }, 1000);
 //     }
-//   }, [isRunning, onTimeUp]);
 
-//   useEffect(() => {
 //     return () => {
 //       if (timerRef.current) {
 //         clearInterval(timerRef.current);
 //       }
 //     };
-//   }, []);
+//   }, [isRunning, onTimeUp]);
 
 //   const getTimerColor = () => {
 //     if (timeLeft <= 10) return 'text-red-400';
@@ -83,9 +75,7 @@
 
 //       {isRunning && (
 //         <button
-//           onClick={() => {
-//             onEndGame();
-//           }}
+//           onClick={onEndGame}
 //           className="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-4 py-2 rounded-full text-sm font-bold transition-colors flex items-center"
 //         >
 //           <svg
@@ -124,9 +114,11 @@ import { useEffect, useState, useRef } from 'react';
 const Timer = ({ initialTime, onTimeUp, isRunning, onEndGame, resetTrigger }) => {
   const [timeLeft, setTimeLeft] = useState(initialTime);
   const timerRef = useRef(null);
+  const [isTimeUpCalled, setIsTimeUpCalled] = useState(false);
 
   useEffect(() => {
     setTimeLeft(initialTime);
+    setIsTimeUpCalled(false);
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
@@ -142,15 +134,17 @@ const Timer = ({ initialTime, onTimeUp, isRunning, onEndGame, resetTrigger }) =>
   useEffect(() => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
-      timerRef.current = null;
     }
 
-    if (isRunning) {
+    if (isRunning && timeLeft > 0) {
       timerRef.current = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
             clearInterval(timerRef.current);
-            onTimeUp();
+            if (!isTimeUpCalled) {
+              setIsTimeUpCalled(true);
+              onTimeUp();
+            }
             return 0;
           }
           return prev - 1;
@@ -163,7 +157,7 @@ const Timer = ({ initialTime, onTimeUp, isRunning, onEndGame, resetTrigger }) =>
         clearInterval(timerRef.current);
       }
     };
-  }, [isRunning, onTimeUp]);
+  }, [isRunning, onTimeUp, isTimeUpCalled, timeLeft]);
 
   const getTimerColor = () => {
     if (timeLeft <= 10) return 'text-red-400';
