@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import Confetti from '../common/Confetti';
 import Button from '../common/Button';
 import { useAudio } from '../../hooks/useAudio';
 import useGame from '../../hooks/useGame';
@@ -33,8 +32,6 @@ const GameResult = ({ onNewGame }) => {
 
   return (
     <div className="text-center">
-      <Confetti active={getResult() === 'player'} />
-
       <div className="mb-8">
         <h2
           className={`text-4xl font-bold mb-4 font-display ${

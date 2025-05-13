@@ -5,6 +5,7 @@ import GameBoard from '../game/GameBoard'
 import Timer from '../game/Timer'
 import GameResult from '../game/GameResult'
 import Button from '../common/Button'
+import Confetti from '../common/Confetti';
 
 const Game = () => {
   const {
@@ -14,14 +15,23 @@ const Game = () => {
     handleGameEnd,
     newGame,
     setShowRules,
+    playerScore,
+    computerScore
   } = useGame()
 
   useEffect(() => {
     document.title = 'Play Game | Rock Paper Scissors Ultimate'
   }, [])
 
+  const getResult = () => {
+    if (playerScore > computerScore) return 'player';
+    if (computerScore > playerScore) return 'computer';
+    return 'draw';
+  }
+
   return (
     <section className="min-h-screen bg-game-pattern bg-cover bg-center py-12 px-4">
+      <Confetti active={getResult() === 'player' && gameEnded} />
       <div className="max-w-4xl mx-auto">
         <div className="bg-dark/80 backdrop-blur-md rounded-3xl shadow-2xl p-6 md:p-8">
           <Timer 

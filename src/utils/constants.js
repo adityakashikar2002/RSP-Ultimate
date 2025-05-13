@@ -10,4 +10,4 @@ export const RESULTS = {
   DRAW: 'draw',
 }
 
-export const DEFAULT_GAME_TIME = 60 // seconds
+export const DEFAULT_GAME_TIME = 30 // seconds
