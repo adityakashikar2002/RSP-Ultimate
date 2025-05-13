@@ -24,11 +24,11 @@ const Navbar = () => {
       <div className="container mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
           <Link to="/" className="flex items-center space-x-2">
-            <img 
+            {/* <img 
               src="/assets/images/logo.jpg" 
               alt="Logo" 
-              className="h-10 w-10"
-            />
+              className="h-16 w-16"
+            /> */}
             <span className="text-2xl font-bold text-primary font-display">
               RPS Ultimate
             </span>
