@@ -1,0 +1,74 @@
+/* Add these to your existing App.css */
+
+/* Choice animations */
+.choice-animation {
+  transition: all 0.3s ease;
+}
+
+.choice-animation:hover {
+  transform: translateY(-5px);
+}
+
+.choice-animation:active {
+  transform: translateY(0);
+}
+
+/* Pulse animation for winning choice */
+@keyframes pulse-win {
+  0% {
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(74, 222, 128, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0);
+  }
+}
+
+.pulse-win {
+  animation: pulse-win 1.5s infinite;
+}
+
+/* Gradient text */
+.text-gradient {
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.text-gradient-primary {
+  background-image: linear-gradient(to right, #6366f1, #8b5cf6);
+}
+
+/* Custom underline animation */
+.hover-underline-animation {
+  display: inline-block;
+  position: relative;
+}
+
+.hover-underline-animation::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: #6366f1;
+  transform-origin: bottom right;
+  transition: transform 0.25s ease-out;
+}
+
+.hover-underline-animation:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+/* Responsive tweaks */
+@media (max-width: 640px) {
+  .choice-card {
+    height: 80px;
+    width: 80px;
+  }
+}
